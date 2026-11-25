@@ -1,0 +1,266 @@
+{
+  "mode": "playbook",
+  "generated_at": "2026-11-25T17:56:30+00:00",
+  "n": 200,
+  "correct": 194,
+  "accuracy": 0.97,
+  "abstained": 6,
+  "misclassified": 0,
+  "accuracy_when_answered": 1.0,
+  "citation_ok": 200,
+  "citation_rate": 1.0,
+  "avg_queries": 4.44,
+  "p50_ms": 28.8,
+  "p95_ms": 37.0,
+  "per_class": {
+    "TIMING": {
+      "support": 38,
+      "tp": 38,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "MISSED_CA": {
+      "support": 31,
+      "tp": 29,
+      "precision": 1.0,
+      "recall": 0.9355
+    },
+    "STALE_PRICE": {
+      "support": 34,
+      "tp": 34,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "FX": {
+      "support": 31,
+      "tp": 31,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "FAILED_SETTLEMENT": {
+      "support": 36,
+      "tp": 34,
+      "precision": 1.0,
+      "recall": 0.9444
+    },
+    "BOOKING_ERROR": {
+      "support": 30,
+      "tp": 28,
+      "precision": 1.0,
+      "recall": 0.9333
+    }
+  },
+  "confusion": {
+    "TIMING": {
+      "TIMING": 38
+    },
+    "MISSED_CA": {
+      "MISSED_CA": 29,
+      "UNEXPLAINED": 2
+    },
+    "STALE_PRICE": {
+      "STALE_PRICE": 34
+    },
+    "FX": {
+      "FX": 31
+    },
+    "FAILED_SETTLEMENT": {
+      "FAILED_SETTLEMENT": 34,
+      "UNEXPLAINED": 2
+    },
+    "BOOKING_ERROR": {
+      "UNEXPLAINED": 2,
+      "BOOKING_ERROR": 28
+    }
+  },
+  "by_variant": [
+    {
+      "cause": "BOOKING_ERROR",
+      "variant": "fat_finger",
+      "n": 8,
+      "correct": 8
+    },
+    {
+      "cause": "BOOKING_ERROR",
+      "variant": "transposed",
+      "n": 6,
+      "correct": 6
+    },
+    {
+      "cause": "BOOKING_ERROR",
+      "variant": "wrong_account_custodian_side",
+      "n": 3,
+      "correct": 3
+    },
+    {
+      "cause": "BOOKING_ERROR",
+      "variant": "wrong_account_ibor_side",
+      "n": 3,
+      "correct": 3
+    },
+    {
+      "cause": "BOOKING_ERROR",
+      "variant": "wrong_security_custodian_side",
+      "n": 1,
+      "correct": 0
+    },
+    {
+      "cause": "BOOKING_ERROR",
+      "variant": "wrong_security_ibor_side",
+      "n": 1,
+      "correct": 0
+    },
+    {
+      "cause": "BOOKING_ERROR",
+      "variant": "wrong_side",
+      "n": 8,
+      "correct": 8
+    },
+    {
+      "cause": "FAILED_SETTLEMENT",
+      "variant": "aged_failed",
+      "n": 2,
+      "correct": 0
+    },
+    {
+      "cause": "FAILED_SETTLEMENT",
+      "variant": "failed",
+      "n": 20,
+      "correct": 20
+    },
+    {
+      "cause": "FAILED_SETTLEMENT",
+      "variant": "partial",
+      "n": 5,
+      "correct": 5
+    },
+    {
+      "cause": "FAILED_SETTLEMENT",
+      "variant": "past_due_pending",
+      "n": 9,
+      "correct": 9
+    },
+    {
+      "cause": "FX",
+      "variant": "intraday_fixing",
+      "n": 10,
+      "correct": 10
+    },
+    {
+      "cause": "FX",
+      "variant": "prior_day_fixing",
+      "n": 21,
+      "correct": 21
+    },
+    {
+      "cause": "MISSED_CA",
+      "variant": "2_dividends_not_booked",
+      "n": 1,
+      "correct": 1
+    },
+    {
+      "cause": "MISSED_CA",
+      "variant": "booked_gross_paid_net",
+      "n": 2,
+      "correct": 0
+    },
+    {
+      "cause": "MISSED_CA",
+      "variant": "dividend_not_booked",
+      "n": 14,
+      "correct": 14
+    },
+    {
+      "cause": "MISSED_CA",
+      "variant": "not_processed",
+      "n": 12,
+      "correct": 12
+    },
+    {
+      "cause": "MISSED_CA",
+      "variant": "wrong_ratio",
+      "n": 2,
+      "correct": 2
+    },
+    {
+      "cause": "STALE_PRICE",
+      "variant": "feed_stopped",
+      "n": 26,
+      "correct": 26
+    },
+    {
+      "cause": "STALE_PRICE",
+      "variant": "feed_stopped+secondary_fx",
+      "n": 1,
+      "correct": 1
+    },
+    {
+      "cause": "STALE_PRICE",
+      "variant": "restamped_prior_close",
+      "n": 7,
+      "correct": 7
+    },
+    {
+      "cause": "TIMING",
+      "variant": "t+1_pending",
+      "n": 15,
+      "correct": 15
+    },
+    {
+      "cause": "TIMING",
+      "variant": "t+1_unmatched",
+      "n": 9,
+      "correct": 9
+    },
+    {
+      "cause": "TIMING",
+      "variant": "t+2_pending",
+      "n": 12,
+      "correct": 12
+    },
+    {
+      "cause": "TIMING",
+      "variant": "t+2_unmatched",
+      "n": 2,
+      "correct": 2
+    }
+  ],
+  "misses": [
+    {
+      "break_id": "BRK-0003",
+      "truth": "BOOKING_ERROR",
+      "variant": "wrong_security_custodian_side",
+      "predicted": "UNEXPLAINED"
+    },
+    {
+      "break_id": "BRK-0026",
+      "truth": "MISSED_CA",
+      "variant": "booked_gross_paid_net",
+      "predicted": "UNEXPLAINED"
+    },
+    {
+      "break_id": "BRK-0039",
+      "truth": "MISSED_CA",
+      "variant": "booked_gross_paid_net",
+      "predicted": "UNEXPLAINED"
+    },
+    {
+      "break_id": "BRK-0136",
+      "truth": "FAILED_SETTLEMENT",
+      "variant": "aged_failed",
+      "predicted": "UNEXPLAINED"
+    },
+    {
+      "break_id": "BRK-0167",
+      "truth": "FAILED_SETTLEMENT",
+      "variant": "aged_failed",
+      "predicted": "UNEXPLAINED"
+    },
+    {
+      "break_id": "BRK-0185",
+      "truth": "BOOKING_ERROR",
+      "variant": "wrong_security_ibor_side",
+      "predicted": "UNEXPLAINED"
+    }
+  ]
+}
