@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Break Investigator</title>
+<meta name="description" content="An agent that investigates IBOR vs custodian position and cash breaks through read-only SQL, cites the rows behind every finding, and waits for an analyst to sign off.">
+<meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="Break Investigator">
+<meta property="og:description" content="IBOR vs custodian breaks, investigated with read-only SQL. Evidence attached.">
+<meta property="og:image" content="assets/preview.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235856d6'/%3E%3Cpath d='M18 22h12M18 32h20M18 42h9' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='44' cy='40' r='8' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M50 46l5 5' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip" href="#investigate">Skip to the investigator</a>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" aria-label="Break Investigator home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Break Investigator</span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#investigate">Investigate</a>
+      <a href="#benchmark">Benchmark</a>
+      <a href="#how">How it works</a>
+      <a href="https://github.com/Rahu378/ibor-break-investigator" class="gh">GitHub</a>
+      <button class="theme" id="theme" type="button" aria-label="Toggle dark mode">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path class="sun" d="M12 4V2m0 20v-2m8-8h2M2 12h2m13.66-5.66 1.41-1.41M4.93 19.07l1.41-1.41m0-11.32L4.93 4.93m14.14 14.14-1.41-1.41M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="moon" d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero wrap">
+    <p class="eyebrow">IBOR vs custodian reconciliation</p>
+    <h1>Breaks, investigated.<br><span class="grad">Evidence attached.</span></h1>
+    <p class="lede">An agent that pulls positions, trades, settlements, corporate actions, prices and FX through read-only SQL, names the root cause, and cites every row it relied on. Nothing closes until an analyst signs off.</p>
+    <div class="stats" id="stats" aria-live="polite">
+      <div class="stat"><b data-count="200">0</b><span>seeded breaks</span></div>
+      <div class="stat"><b data-count="97.0" data-suffix="%" data-dec="1">0</b><span>matched the seeded label</span></div>
+      <div class="stat"><b data-count="0">0</b><span>wrong calls (6 sent to a human)</span></div>
+      <div class="stat"><b data-count="100" data-suffix="%">0</b><span>findings cite their rows</span></div>
+    </div>
+    <div class="mosaic-card reveal">
+      <div class="mosaic-head">
+        <div>
+          <h2 class="h3">All 200 breaks, as the agent called them</h2>
+          <p class="muted small">Each tile is one break. Hover for detail, click to open the investigation.</p>
+        </div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="mosaic" id="mosaic" role="group" aria-label="Breaks by root cause"></div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="investigate">
+    <div class="section-head reveal">
+      <p class="eyebrow">Live replay</p>
+      <h2>Pick a break. Watch it get worked.</h2>
+      <p class="lede small-lede">Every step, query and row below was recorded from a real run of the investigator in this repo. Then it's your call: approve, edit or reject.</p>
+    </div>
+
+    <div class="flow reveal" id="flow" aria-label="Workflow stage">
+      <div class="node" data-node="load_break"><i></i>load_break</div><span class="edge"></span>
+      <div class="node" data-node="investigate"><i></i>investigate</div><span class="edge"></span>
+      <div class="node" data-node="check_citations"><i></i>check_citations</div><span class="edge"></span>
+      <div class="node" data-node="propose_fix"><i></i>propose_fix</div><span class="edge"></span>
+      <div class="node" data-node="human_review"><i></i>human_review</div><span class="edge"></span>
+      <div class="node" data-node="close"><i></i><span id="close-label">close</span></div>
+    </div>
+
+    <div class="app reveal">
+      <aside class="pane queue-pane" aria-label="Break queue">
+        <div class="pane-head">
+          <div class="search">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="q" type="search" placeholder="Break, ticker or account" autocomplete="off" aria-label="Search breaks">
+          </div>
+          <div class="seg" id="typeSeg" role="tablist" aria-label="Break type">
+            <button role="tab" data-type="ALL" aria-selected="true">All</button>
+            <button role="tab" data-type="QTY">Qty</button>
+            <button role="tab" data-type="MV">MV</button>
+            <button role="tab" data-type="CASH">Cash</button>
+          </div>
+          <select id="causeSel" aria-label="Filter by root cause"></select>
+        </div>
+        <ul class="queue" id="queue"></ul>
+        <div class="pane-foot muted small" id="queueCount"></div>
+      </aside>
+
+      <section class="pane work-pane" aria-label="Investigation">
+        <div class="work-head" id="workHead"></div>
+        <div class="controls">
+          <button class="btn sm" id="replay" type="button">
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Replay
+          </button>
+          <button class="btn sm" id="skip" type="button">Skip to result</button>
+          <div class="seg sm" id="speed" aria-label="Replay speed">
+            <button data-speed="1" aria-selected="true">1x</button>
+            <button data-speed="2">2x</button>
+            <button data-speed="4">4x</button>
+          </div>
+        </div>
+        <ol class="steps" id="steps" aria-live="polite"></ol>
+      </section>
+
+      <aside class="pane finding-pane" aria-label="Finding and review">
+        <div id="finding" class="finding empty">
+          <p class="muted">The finding shows up here once the investigation finishes.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section wrap" id="benchmark">
+    <div class="section-head reveal">
+      <p class="eyebrow">Benchmark</p>
+      <h2>200 breaks. Six root causes. Scored against the seeded labels.</h2>
+      <p class="lede small-lede">The breaks come out of an actual recon run over two synthetic books, so the labels are known. The agent never sees them: the answer key isn't on its SQL allow-list and isn't granted to its database role.</p>
+    </div>
+    <div class="bench reveal" id="bench"></div>
+  </section>
+
+  <section class="section wrap" id="how">
+    <div class="section-head reveal">
+      <p class="eyebrow">How it works</p>
+      <h2>Read-only by construction. Human by default.</h2>
+    </div>
+    <div class="arch reveal" id="arch">
+      <div class="arch-col">
+        <div class="arch-box db">
+          <h4>Recon warehouse</h4>
+          <p>PostgreSQL. Positions, trades, settlements, corporate actions, prices, FX, cash.</p>
+          <span class="tag">role: breakbot_agent · SELECT only · read-only txn · 5s timeout</span>
+        </div>
+      </div>
+      <div class="arch-arrow" aria-hidden="true"></div>
+      <div class="arch-col">
+        <div class="arch-box guard">
+          <h4>SQL guard</h4>
+          <p>sqlglot parses every statement. One SELECT, allow-listed tables, banned functions, LIMIT added.</p>
+        </div>
+        <div class="arch-box">
+          <h4>Tools</h4>
+          <p>positions · recent_trades · corporate_actions · prices · fx · unmatched_cash · run_sql. Each call gets a query id.</p>
+        </div>
+      </div>
+      <div class="arch-arrow" aria-hidden="true"></div>
+      <div class="arch-col">
+        <div class="arch-box agent">
+          <h4>Investigator</h4>
+          <p>Claude with tool use, or the deterministic playbook. Quantifies each hypothesis against the break amount.</p>
+        </div>
+        <div class="arch-box">
+          <h4>LangGraph</h4>
+          <p>check_citations rejects dangling [Qn:rm] references. human_review is an interrupt: the run parks until someone decides.</p>
+        </div>
+      </div>
+      <div class="arch-arrow" aria-hidden="true"></div>
+      <div class="arch-col">
+        <div class="arch-box human">
+          <h4>Analyst</h4>
+          <p>Streamlit queue. Approve, edit the cause / fix / owner team, or reject back to manual.</p>
+        </div>
+        <div class="arch-box">
+          <h4>Audit</h4>
+          <p>Every node, query and decision appended to a separate audit store the agent can't write to.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="schema reveal">
+      <div class="schema-head">
+        <h3 class="h3">What the agent can see</h3>
+        <p class="muted small">Tables in the warehouse. The answer key is in the same database and still out of reach.</p>
+      </div>
+      <div class="tables" id="tables"></div>
+    </div>
+
+    <div class="guard-demo reveal">
+      <h3 class="h3">Things the guard refuses</h3>
+      <div class="refusals" id="refusals"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p>Built by Rahul Reddy Chidipudi. Python, LangGraph, Claude API, PostgreSQL, pandas, Streamlit.</p>
+    <p class="muted small">All data is synthetic. This page replays recorded runs (<code>python -m breakbot.export_site</code>); review decisions you make here stay in your browser.</p>
+    <p><a href="https://github.com/Rahu378/ibor-break-investigator">Source on GitHub</a></p>
+  </div>
+</footer>
+
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<script src="assets/app.js" defer></script>
+</body>
+</html>
